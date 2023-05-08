@@ -1,0 +1,89 @@
+--View table covid death
+Select *
+From PortfolioProject..CovidDeaths
+order by 3,4 
+
+--Filter for countries only
+Select *
+From PortfolioProject..CovidVaccinations
+where continent is not null
+order by 3,4 
+
+Select Location, date, total_cases, total_deaths, population
+From PortfolioProject..CovidDeaths
+order by 1,2
+
+-- Add column total death by total cases (% death for total cases)
+-- Filter for Canada
+Select Location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as PercentageDeath
+From PortfolioProject..CovidDeaths
+Where Location like '%Canada%'
+order by 1,2
+
+-- Add column total % covid cases for population size
+-- Filter for Canada
+
+Select Location, date, total_cases, Population, (total_cases/Population)*100 as PercentageCases
+From PortfolioProject..CovidDeaths
+Where Location like '%Canada%'
+order by 1,2
+
+-- Add column total % covid cases for population size
+-- for all countries
+Select Location, date, total_cases, Population, (total_cases/Population)*100 as PercentagePopInfected
+From PortfolioProject..CovidDeaths
+order by 1,2
+
+-- List of countries with highest % of COVID infection rates
+Select Location, Population, MAX(total_cases) as HighestInfectRate,  MAX((total_cases/Population))*100 as PercentagePopInfected
+From PortfolioProject..CovidDeaths
+Group by Location, Population
+order by PercentagePopInfected desc
+
+-- List of countries with highest death rate count 
+Select Location, MAX(total_deaths) as NumDeathCount
+From PortfolioProject..CovidDeaths
+where continent is not null
+Group by Location
+order by NumDeathCount desc
+
+-- List of continents with highest death rate count 
+Select location, MAX(total_deaths) as NumDeathCount
+From PortfolioProject..CovidDeaths
+where continent is null
+Group by location
+order by NumDeathCount desc
+
+-- Daily case count Global 
+Select date, SUM(new_cases) as DailyCaseCount, SUM(new_deaths) as DailyDeathCount, SUM(new_deaths)/NULLIF(SUM(new_cases),0)*100 as PercentDeath
+From PortfolioProject..CovidDeaths
+where continent is not null
+Group by date
+order by 1,2
+
+-- TOTAL count Global 
+Select SUM(new_cases) as TotalCaseCount, SUM(new_deaths) as TotalDeathCount, SUM(new_deaths)/NULLIF(SUM(new_cases),0)*100 as PercentDeath
+From PortfolioProject..CovidDeaths
+where continent is not null
+order by 1,2
+
+--view table covid vaccinations
+Select *
+From PortfolioProject..CovidDeaths
+order by 1,2
+
+
+--Join death and vaccine table
+--filter for new vaccines by country
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+From PortfolioProject..CovidDeaths dea
+Join PortfolioProject..CovidVaccinations vac
+	on dea.location = vac.location
+	and dea.date = vac.date
+where dea.continent is not null
+order by 2,3
+
+
+
+
+
